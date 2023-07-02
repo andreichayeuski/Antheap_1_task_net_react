@@ -1,5 +1,7 @@
-﻿using Antheap_1_task_net_react.Data.Entities;
+﻿using Antheap_1_task_net_react.Contracts;
+using Antheap_1_task_net_react.Data.Entities;
 using Antheap_1_task_net_react.Data.Repositories;
+using Antheap_1_task_net_react.Settings;
 using Antheap_1_task_net_react.ViewModels;
 using AutoMapper;
 
@@ -9,11 +11,13 @@ namespace Antheap_1_task_net_react.Services
     {
         private readonly ICompanyRepository _companyRepository;
         private readonly IMapper _mapper;
+        private readonly IConfiguration _configuration;
 
-        public CompanyService(ICompanyRepository companyRepository, IMapper mapper)
+        public CompanyService(ICompanyRepository companyRepository, IMapper mapper, IConfiguration configuration)
         {
             _companyRepository = companyRepository;
             _mapper = mapper;
+            _configuration = configuration;
         }
 
         public async Task<IEnumerable<CompanyViewModel>> GetAllCompanies()
@@ -33,7 +37,11 @@ namespace Antheap_1_task_net_react.Services
             var company = await _companyRepository.GetCompanyByNipAsync(nip);
             if (company == null)
             {
-                company = await SearchCompanyInAPI();
+                company = await SearchCompanyInAPI(nip);
+                if (company == null)
+                {
+                    return null;
+                }
             }
             var companyViewModel = _mapper.Map<CompanyViewModel>(company);
             companyViewModel = MapRepresentatives(companyViewModel, company);
@@ -72,9 +80,28 @@ namespace Antheap_1_task_net_react.Services
             return true;
         }
 
-        private async Task<CompanyEntity> SearchCompanyInAPI()
+        private async Task<CompanyEntity> SearchCompanyInAPI(string nip)
         {
-            return null;
+            try
+            {
+                var settings = _configuration.GetSection("APIRejestrWL").Get<APIRejestrWLSettings>();
+                string url = $"{settings.BaseUrl}{settings.SearchByNipUrl}{nip}?date={DateTime.Now:yyyy-MM-dd}";
+
+                using (var httpClient = new HttpClient())
+                {
+                    HttpResponseMessage response = await httpClient.GetAsync(url);
+                    response.EnsureSuccessStatusCode();
+                    var result = await response.Content.ReadFromJsonAsync<SearchNipContract>();
+                    var company = result.Result.Subject;
+                    await _companyRepository.AddAsync(company);
+                    return company;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
+                return null;
+            }
         }
 
         private CompanyViewModel MapRepresentatives(CompanyViewModel companyViewModel, CompanyEntity companyEntity)

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using Antheap_1_task_net_react.Enums;
+using System.ComponentModel;
 
 namespace Antheap_1_task_net_react.Data.Entities
 {
@@ -11,7 +12,7 @@ namespace Antheap_1_task_net_react.Data.Entities
         public string? Nip { get; set; }
         
         [Description("Status podatnika VAT")]
-        public int? StatusVat { get; set; }
+        public string? StatusVat { get; set; }
 
         [Description("Numer identyfikacyjny REGON")]
         public string? Regon { get; set; }
