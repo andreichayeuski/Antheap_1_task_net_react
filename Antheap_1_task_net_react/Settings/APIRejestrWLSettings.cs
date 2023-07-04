@@ -4,5 +4,6 @@
     {
         public string BaseUrl { get; set; }
         public string SearchByNipUrl { get; set; }
+        public string BaseTestUrl { get; set; }
     }
 }

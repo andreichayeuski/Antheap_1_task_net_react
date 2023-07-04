@@ -80,19 +80,26 @@ namespace Antheap_1_task_net_react.Services
             return true;
         }
 
-        private async Task<CompanyEntity> SearchCompanyInAPI(string nip)
+        private async Task<CompanyEntity?> SearchCompanyInAPI(string nip)
         {
             try
             {
                 var settings = _configuration.GetSection("APIRejestrWL").Get<APIRejestrWLSettings>();
                 string url = $"{settings.BaseUrl}{settings.SearchByNipUrl}{nip}?date={DateTime.Now:yyyy-MM-dd}";
+                string testUrl = $"{settings.BaseTestUrl}{settings.SearchByNipUrl}{nip}?date={DateTime.Now:yyyy-MM-dd}";
 
                 using (var httpClient = new HttpClient())
                 {
-                    HttpResponseMessage response = await httpClient.GetAsync(url);
+                    httpClient.DefaultRequestHeaders.Add("Accept", "*/*");
+                    var response = await httpClient.GetAsync(url);
+                    if (!response.IsSuccessStatusCode)
+                    {
+                        response = await httpClient.GetAsync(testUrl);
+                    }
                     response.EnsureSuccessStatusCode();
                     var result = await response.Content.ReadFromJsonAsync<SearchNipContract>();
-                    var company = result.Result.Subject;
+                    var company = result?.Result.Subject;
+                    if (company == null) return null;
                     await _companyRepository.AddAsync(company);
                     return company;
                 }
