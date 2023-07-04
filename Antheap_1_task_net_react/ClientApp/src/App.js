@@ -1,22 +1,22 @@
 import React, { Component } from 'react';
 import { Route, Routes } from 'react-router-dom';
-import AppRoutes from './AppRoutes';
-import { Layout } from './components/Layout';
-import './custom.css';
+import AppRoutes from './routes/AppRoutes';
+import { LayoutComponent } from './components/LayoutComponent';
+import './styles/custom.css';
 
 export default class App extends Component {
   static displayName = App.name;
 
   render() {
     return (
-      <Layout>
+      <LayoutComponent>
         <Routes>
           {AppRoutes.map((route, index) => {
             const { element, ...rest } = route;
             return <Route key={index} {...rest} element={element} />;
           })}
         </Routes>
-      </Layout>
+      </LayoutComponent>
     );
   }
 }

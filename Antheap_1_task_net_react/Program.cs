@@ -26,7 +26,12 @@ namespace Antheap_1_task_net_react
 
             app.UseStaticFiles();
             app.UseRouting();
-
+            app.UseCors(builder =>
+            {
+                builder.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+            });
 
             app.MapControllerRoute(
                 name: "default",

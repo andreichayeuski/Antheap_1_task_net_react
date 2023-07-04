@@ -1,6 +1,4 @@
-﻿using Antheap_1_task_net_react.Data.Entities;
-using Antheap_1_task_net_react.Operations;
-using Antheap_1_task_net_react.ViewModels;
+﻿using Antheap_1_task_net_react.Operations;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Antheap_1_task_net_react.Controllers

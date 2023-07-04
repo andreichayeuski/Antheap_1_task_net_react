@@ -12,6 +12,8 @@ namespace Antheap_1_task_net_react.Extensions
     {
         public static void ConfigureServices(this IServiceCollection services)
         {
+            services.AddCors();
+
             services.AddScoped<ICompanyRepository, CompanyRepository>();
 
             services.AddScoped<ICompanyService, CompanyService>();
